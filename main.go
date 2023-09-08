@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+
+	"github.com/mrojasb2000/go-react-crud/models"
 )
 
 const dBName = "react-crud"
@@ -30,16 +32,33 @@ func main() {
 	app.Static("/", "./client/dist")
 
 	app.Get("/users", func(c *fiber.Ctx) error {
+		var users []models.User
+
+		coll := client.Database(dBName).Collection("users")
+		result, err := coll.Find(context.TODO(), bson.M{})
+
+		if err != nil {
+			panic(err)
+		}
+
+		for result.Next(context.TODO()) {
+			var user models.User
+			result.Decode(&user)
+			users = append(users, user)
+		}
 		return c.JSON(&fiber.Map{
-			"message": "users list from backend",
+			"users": users,
 		})
 	})
 
 	app.Post("/users", func(c *fiber.Ctx) error {
+		var user models.User
+		c.BodyParser(&user)
+
 		_, err := coll.InsertOne(
 			context.TODO(),
 			bson.D{
-				{Key: "name", Value: "Mavro"},
+				{Key: "name", Value: user.Name},
 			},
 		)
 		if err != nil {
