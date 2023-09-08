@@ -4,12 +4,12 @@ function App() {
     <>
       <div>Hello World</div>
       <button onClick={async () => {
-        const response = await fetch('/users')
+        const response = await fetch(import.meta.env.VITE_API + '/users')
         const data = await response.json()
         console.log(data)
       }}>Get users</button>
       <button onClick={async () => {
-      const response = await fetch('http://localhost:3000/users', {
+      const response = await fetch(import.meta.env.VITE_API + '/users', {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -18,7 +18,6 @@ function App() {
         body: JSON.stringify({name: "John Doe"})
         }).then(response => response.json())
         .then(response => console.log(response));
-        console.log(response);
       }}>Create User</button>
     </>
   )
